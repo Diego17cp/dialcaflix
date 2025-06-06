@@ -7,6 +7,15 @@ public class Movie {
     private String description;
     private String poster_url;
     public Movie() {}
+    // Constructor para nuevos movies
+    public Movie(String title, String description, String genre, int year,  String poster_url) {
+        this.title = title;
+        this.genre = genre;
+        this.year = year;
+        this.description = description;
+        this.poster_url = poster_url;
+    }
+    // Constructor para movies ya registrados
     public Movie(int id, String title, String genre, int year, String description, String poster_url) {
         this.id = id;
         this.title = title;
