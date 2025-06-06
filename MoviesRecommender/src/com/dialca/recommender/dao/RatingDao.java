@@ -54,7 +54,63 @@ public class RatingDao {
         }
         return ratings;
     }
-
+    public Rating findByUserAndMovie(Users user, Movie movie) {
+        String sql = "SELECT * FROM rating WHERE user_id = ? AND movie_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, user.getId());
+            stmt.setInt(2, movie.getId());
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new Rating(rs.getInt("id"), user, movie, rs.getInt("rate"),
+                        rs.getTimestamp("rating_date").toLocalDateTime());
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al buscar calificación por usuario y película");
+            e.printStackTrace();
+        }
+        return null;
+    }
+    public double getAverageRatingForMovie(int movieId){
+        String sql = "SELECT AVG(rate) AS average_rating FROM rating WHERE movie_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, movieId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getDouble("average_rating");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener la calificación promedio de la película");
+            e.printStackTrace();
+        }
+        return 0.0;
+    }
+    public List<Movie> getTopRatedMovies(int limit) {
+        List<Movie> topRatedMovies = new ArrayList<>();
+        String sql = """
+                    SELECT m.*, AVG(r.rate) AS average_rating
+                    FROM movie m
+                    JOIN rating r ON m.id = r.movie_id
+                    GROUP BY m.id
+                    ORDER BY average_rating DESC
+                    LIMIT ?
+                """;
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, limit);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Movie movie = new Movie(rs.getInt("id"), rs.getString("title"), rs.getString("genre"),
+                        rs.getInt("year"), rs.getString("description"), rs.getString("poster_url"));
+                topRatedMovies.add(movie);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener las películas mejor valoradas");
+            e.printStackTrace();
+        }
+        return topRatedMovies;
+    }
     public boolean updateRating(Rating rating) {
         String sql = "UPDATE rating SET rate = ?, rating_date = current_timestamp WHERE user_id = ? AND movie_id = ?";
         try (Connection conn = DBConnection.getConnection();
