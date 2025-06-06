@@ -37,6 +37,22 @@ public class UsersDao {
         }
         return null;
     }
+    public Users findByEmailAndPassword(String email, String password) {
+        String sql = "SELECT * FROM users WHERE email = ? AND password = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, email);
+            stmt.setString(2, password);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new Users(rs.getInt("id"), rs.getString("name"), rs.getString("email"), rs.getString("password"));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al buscar usuario por email y contraseña");
+            e.printStackTrace();
+        }
+        return null;
+    }
     public List<Users> getAll() {
         List<Users> users = new ArrayList<>();
         String sql = "SELECT * FROM users";
