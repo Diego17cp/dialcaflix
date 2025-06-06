@@ -30,14 +30,20 @@ public class RecommenderEngine {
     }
     public List<Movie> getBasicRecommendations() {
         List<Movie> topRatedMovies = ratingController.getTopRatedMovies(MAX_RECOMMENDATIONS);
+        
         if (topRatedMovies.size() < MAX_RECOMMENDATIONS) {
-            List<Movie> allMovies = movieController.getAllMovies();
-            List<Movie> additonalMovies = allMovies.stream()
+            List<Movie> allMovies = movieController.getAllMovies();            
+            List<Movie> candidateMovies = allMovies.stream()
                 .filter(movie -> !topRatedMovies.contains(movie))
+                .collect(Collectors.toList());            
+            Collections.shuffle(candidateMovies);            
+            List<Movie> randomAdditionalMovies = candidateMovies.stream()
                 .limit(MAX_RECOMMENDATIONS - topRatedMovies.size())
                 .collect(Collectors.toList());
-            topRatedMovies.addAll(additonalMovies);
+            
+            topRatedMovies.addAll(randomAdditionalMovies);
         }
+        
         return topRatedMovies;
     }
     private List<Movie> getPersonalizedRecommendations(Users user, List<Rating> userRatings) {
