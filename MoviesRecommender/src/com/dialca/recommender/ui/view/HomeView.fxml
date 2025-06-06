@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Font?>
+
+<StackPane fx:id="root" xmlns:fx="http://javafx.com/fxml" 
+           fx:controller="com.dialca.recommender.ui.controller.HomeController"
+           stylesheets="@../styles/home-styles.css">
+    <AnchorPane prefWidth="800" prefHeight="600">
+        <!-- Botones en la esquina derecha -->
+        <HBox spacing="10" alignment="CENTER_RIGHT" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="20">
+            <Button text="Iniciar sesión" fx:id="btnLogin" styleClass="modern-button"/>
+            <Button text="Registrarse" fx:id="btnRegister" styleClass="modern-button"/>
+        </HBox>
+        
+        <!-- Contenido central -->
+        <VBox alignment="CENTER" spacing="20" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" 
+              AnchorPane.topAnchor="180" AnchorPane.bottomAnchor="0">
+            <Label text="Bienvenido a DialcaFlix" style="-fx-font-size: 42px; -fx-text-fill: white; -fx-font-weight: bold;">
+                <effect>
+                    <javafx.scene.effect.DropShadow radius="5.0" offsetX="2.0" offsetY="2.0" color="BLACK"/>
+                </effect>
+            </Label>
+            
+            <Label text="Tu plataforma de películas y recomendaciones" 
+                   style="-fx-font-size: 18px; -fx-text-fill: white; -fx-font-style: italic"/>
+            
+            <VBox alignment="CENTER" spacing="30" maxWidth="600">
+                <padding><Insets top="30" bottom="30" left="20" right="20"/></padding>
+                
+                <HBox spacing="40" alignment="CENTER">
+                    <VBox alignment="CENTER" styleClass="feature-box">
+                        <Label text="👁️ Descubre" styleClass="feature-title"/>
+                        <Label text="Nuevos títulos personalizados para ti" styleClass="feature-text"/>
+                    </VBox>
+                    
+                    <VBox alignment="CENTER" styleClass="feature-box">
+                        <Label text="⭐ Califica" styleClass="feature-title"/>
+                        <Label text="Comparte tu opinión sobre películas" styleClass="feature-text"/>
+                    </VBox>
+                    
+                    <VBox alignment="CENTER" styleClass="feature-box">
+                        <Label text="🎬 Disfruta" styleClass="feature-title"/>
+                        <Label text="Contenido exclusivo en cualquier dispositivo" styleClass="feature-text"/>
+                    </VBox>
+                </HBox>
+                
+                <Button text="Comenzar ahora" fx:id="btnStart" styleClass="cta-button"/>
+            </VBox>
+        </VBox>
+    </AnchorPane>
+</StackPane>
