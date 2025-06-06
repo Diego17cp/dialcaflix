@@ -7,6 +7,13 @@ public class Rating {
     private int rate;
     private LocalDateTime ratingDate;
     public Rating() {}
+    // Constructor for creating a new rating
+    public Rating(Users user, Movie movie, int rate, LocalDateTime ratingDate) {
+        this.user = user;
+        this.movie = movie;
+        this.rate = rate;
+        this.ratingDate = ratingDate;
+    }
     public Rating(int id, Users user, Movie movie, int rate, LocalDateTime ratingDate) {
         this.id = id;
         this.user = user;
