@@ -6,11 +6,16 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.Parent;
+import javafx.stage.Stage;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.geometry.Insets;
+import javafx.stage.Modality;
+import javafx.stage.StageStyle;
 
 public class HomeController {
 
@@ -85,18 +90,41 @@ public class HomeController {
 
     private void setupButtonHandlers() {
         btnLogin.setOnAction(event -> {
-            System.out.println("Botón de login presionado");
-            // Aquí irá la lógica para mostrar la pantalla de login
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/dialca/recommender/ui/view/LoginView.fxml"));
+                Parent loginRoot = loader.load();
+                Stage loginStage = new Stage();
+                loginStage.initModality(Modality.APPLICATION_MODAL);
+                loginStage.initStyle(StageStyle.DECORATED);
+                loginStage.setTitle("Iniciar Sesión - DialcaFlix");
+                loginStage.setScene(new Scene(loginRoot));
+                loginStage.setResizable(false);
+                loginStage.showAndWait();
+            } catch (Exception e) {
+                System.err.println("Error al cargar la vista de inicio de sesión: " + e.getMessage());
+                e.printStackTrace();
+            }
         });
 
         btnRegister.setOnAction(event -> {
-            System.out.println("Botón de registro presionado");
-            // Aquí irá la lógica para mostrar la pantalla de registro
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/dialca/recommender/ui/view/RegisterView.fxml"));
+                Parent registerRoot = loader.load();
+                Stage registerStage = new Stage();
+                registerStage.initModality(Modality.APPLICATION_MODAL);
+                registerStage.initStyle(StageStyle.DECORATED);
+                registerStage.setTitle("Registro - DialcaFlix");
+                registerStage.setScene(new Scene(registerRoot));
+                registerStage.setResizable(false);
+                registerStage.showAndWait();
+            } catch (Exception e) {
+                System.err.println("Error al cargar la vista de registro: " + e.getMessage());
+                e.printStackTrace();
+            }
         });
         
         btnStart.setOnAction(event -> {
-            System.out.println("Botón comenzar presionado");
-            // Este botón podría hacer lo mismo que registro o mostrar una pantalla de destacados
+            btnLogin.fire();
         });
     }
 }
