@@ -127,7 +127,24 @@ public class HomeController {
         });
         
         btnStart.setOnAction(event -> {
-            btnLogin.fire();
+            try {
+                Stage currentStage = (Stage) btnStart.getScene().getWindow();
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/dialca/recommender/ui/view/MainView.fxml"));
+                Parent mainRoot = loader.load();
+                MainViewController mainController = loader.getController();
+                mainController.setLoggedInUser(null);
+                Stage mainStage = new Stage();
+                mainStage.initStyle(StageStyle.DECORATED);
+                mainStage.setTitle("DialcaFlix - Descubre tu próxima película");
+                mainStage.setScene(new Scene(mainRoot));
+                mainStage.setMaximized(true);
+                mainStage.show();
+                currentStage.close();
+            }
+            catch (Exception e) {
+                System.err.println("Error al cargar la vista principal: " + e.getMessage());
+                e.printStackTrace();
+            }
         });
     }
 }
