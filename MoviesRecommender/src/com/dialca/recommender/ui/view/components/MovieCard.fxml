@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.shape.Rectangle?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml" 
+            fx:controller="com.dialca.recommender.ui.controller.MovieCardController"
+            styleClass="movie-card"
+            prefWidth="220" prefHeight="340"
+            stylesheets="@../../styles/movie-card-styles.css"
+            >
+    <VBox spacing="0" alignment="TOP_CENTER">
+        <StackPane>
+            <Rectangle width="220" height="280" styleClass="poster-clip"/>
+            <ImageView fx:id="imgPoster" fitWidth="220" fitHeight="280" preserveRatio="true" 
+                        styleClass="poster-image"/>
+            <ProgressIndicator fx:id="loadingIndicator" visible="false" styleClass="loading-indicator"/>
+            <Label fx:id="lblCategory" text="Categoría" styleClass="category-badge">
+                <StackPane.alignment>TOP_RIGHT</StackPane.alignment>
+                <padding><Insets top="8" right="12" bottom="8" left="12"/></padding>
+            </Label>
+        </StackPane>
+        <VBox spacing="8" alignment="TOP_CENTER" styleClass="info-container">
+            <padding><Insets top="12" right="15" bottom="15" left="15"/></padding>
+            <Label fx:id="lblTitle" text="Título de la Película" styleClass="movie-title" 
+                    wrapText="true" alignment="CENTER"/>
+            <Button fx:id="btnWatch" text="VER" styleClass="watch-button" 
+                    maxWidth="120" prefHeight="30"/>
+        </VBox>
+    </VBox>
+    <StackPane fx:id="hoverOverlay" styleClass="hover-overlay" visible="false" 
+                onMouseEntered="#showOverlay" onMouseExited="#hideOverlay"/>
+</StackPane>
