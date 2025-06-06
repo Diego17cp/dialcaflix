@@ -40,6 +40,60 @@ public class MovieDao {
         }
         return null;
     }
+    public Movie findByTitle(String title) {
+        String sql = "SELECT * FROM movie WHERE title = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, title);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new Movie(rs.getInt("id"), rs.getString("title"), rs.getString("genre"),
+                        rs.getInt("year"), rs.getString("description"), rs.getString("poster_url"));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al buscar película por título");
+            e.printStackTrace();
+        }
+        return null;
+    }
+    public List<Movie> findByGenre(String genre) {
+        List<Movie> movies = new ArrayList<>();
+        String sql = "SELECT * FROM movie WHERE genre = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, genre);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Movie movie = new Movie(rs.getInt("id"), rs.getString("title"), rs.getString("genre"),
+                        rs.getInt("year"), rs.getString("description"), rs.getString("poster_url"));
+                movies.add(movie);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al buscar películas por género");
+            e.printStackTrace();
+        }
+        return movies;
+    }
+    public List<Movie> searchMovies(String query) {
+        List<Movie> movies = new ArrayList<>();
+        String sql = "SELECT * FROM movie WHERE title ILIKE ? OR genre ILIKE ? OR description ILIKE ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, "%" + query + "%");
+            stmt.setString(2, "%" + query + "%");
+            stmt.setString(3, "%" + query + "%");
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Movie movie = new Movie(rs.getInt("id"), rs.getString("title"), rs.getString("genre"),
+                        rs.getInt("year"), rs.getString("description"), rs.getString("poster_url"));
+                movies.add(movie);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al buscar películas por consulta");
+            e.printStackTrace();
+        }
+        return movies;
+    }
     public List<Movie> getAll() {
         List<Movie> movies = new ArrayList<>();
         String sql = "SELECT * FROM movie";
