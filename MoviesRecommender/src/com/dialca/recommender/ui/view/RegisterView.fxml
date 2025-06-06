@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.shape.Rectangle?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml" 
+           fx:controller="com.dialca.recommender.ui.controller.RegisterController"
+           prefWidth="500" prefHeight="600"
+           styleClass="login-background"
+           stylesheets="@../styles/login-styles.css">
+           
+    <!-- Panel principal -->
+    <VBox spacing="20" alignment="CENTER" styleClass="login-panel" maxWidth="420" maxHeight="550">
+        <padding><Insets top="30" right="40" bottom="40" left="40"/></padding>
+        
+        <!-- Logo -->
+        <ImageView fx:id="imgLogo" fitWidth="150" fitHeight="160" preserveRatio="true"/>
+        
+        <!-- Título -->
+        <Label text="Crear nueva cuenta" styleClass="login-title"/>
+        
+        <!-- Formulario -->
+        <VBox spacing="15">
+            <VBox spacing="5">
+                <Label text="Nombre completo" styleClass="field-label"/>
+                <TextField fx:id="txtFullName" promptText="Ingresa tu nombre completo" styleClass="text-field"/>
+            </VBox>
+            
+            <VBox spacing="5">
+                <Label text="Email" styleClass="field-label"/>
+                <TextField fx:id="txtEmail" promptText="Ingresa tu email" styleClass="text-field"/>
+            </VBox>
+            
+            <VBox spacing="5">
+                <Label text="Contraseña" styleClass="field-label"/>
+                <PasswordField fx:id="txtPassword" promptText="Ingresa tu contraseña" styleClass="text-field"/>
+            </VBox>
+            
+            <VBox spacing="5">
+                <Label text="Confirmar contraseña" styleClass="field-label"/>
+                <PasswordField fx:id="txtConfirmPassword" promptText="Confirma tu contraseña" styleClass="text-field"/>
+            </VBox>
+            
+            <!-- Términos y condiciones -->
+            <HBox spacing="5" alignment="CENTER_LEFT">
+                <CheckBox fx:id="chkTerms" text="Acepto los términos y condiciones" styleClass="remember-checkbox"/>
+            </HBox>
+        </VBox>
+        
+        <!-- Botones -->
+        <VBox spacing="15" alignment="CENTER">
+            <Button fx:id="btnRegister" text="CREAR CUENTA" styleClass="login-button" maxWidth="Infinity"/>
+            <Button fx:id="btnCancel" text="CANCELAR" styleClass="cancel-button" maxWidth="Infinity"/>
+        </VBox>
+        
+        <!-- Links -->
+        <HBox spacing="5" alignment="CENTER">
+            <Label text="¿Ya tienes una cuenta?" styleClass="text-light"/>
+            <Hyperlink fx:id="linkLogin" text="Inicia sesión" styleClass="login-link"/>
+        </HBox>
+    </VBox>
+</StackPane>
