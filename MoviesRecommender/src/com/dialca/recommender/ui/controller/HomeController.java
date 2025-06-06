@@ -93,6 +93,9 @@ public class HomeController {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/dialca/recommender/ui/view/LoginView.fxml"));
                 Parent loginRoot = loader.load();
+                LoginController loginController = loader.getController();
+                Stage homeStage = (Stage) btnLogin.getScene().getWindow();
+                loginController.setHomeStage(homeStage);
                 Stage loginStage = new Stage();
                 loginStage.initModality(Modality.APPLICATION_MODAL);
                 loginStage.initStyle(StageStyle.DECORATED);
