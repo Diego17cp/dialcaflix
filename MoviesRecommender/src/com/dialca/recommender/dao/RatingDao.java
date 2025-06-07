@@ -29,23 +29,24 @@ public class RatingDao {
     public List<Rating> findByUserId(int userId) {
         List<Rating> ratings = new ArrayList<>();
         String sql = """
-                    SELECT r.*, m.*, u.*
+                    SELECT r.id AS r_id, r.rate AS r_rate, r.rating_date AS r_rating_date,
+                            m.id AS m_id, m.title AS m_title, m.genre AS m_genre,
+                            m.year AS m_year, m.poster_url AS m_poster_url
                     FROM rating r
                     JOIN movie m ON r.movie_id = m.id
-                    JOIN users u ON r.user_id = u.id
                     WHERE r.user_id = ?
+                    LIMIT 50 -- Limitar los resultados para mejorar rendimiento
                 """;
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, userId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                Users user = new Users(rs.getInt("u.id"), rs.getString("u.name"), rs.getString("u.email"),
-                        rs.getString("u.password"));
-                Movie movie = new Movie(rs.getInt("m.id"), rs.getString("m.title"), rs.getString("m.genre"),
-                        rs.getInt("m.year"), rs.getString("m.description"), rs.getString("m.poster_url"));
-                Rating rating = new Rating(rs.getInt("r.id"), user, movie, rs.getInt("r.rate"),
-                        rs.getTimestamp("r.rating_date").toLocalDateTime());
+                Movie movie = new Movie(rs.getInt("m_id"), rs.getString("m_title"), rs.getString("m_genre"),
+                        rs.getInt("m_year"), null, rs.getString("m_poster_url"));
+                Rating rating = new Rating(rs.getInt("r_id"), new Users(userId, null, null, null),
+                        movie, rs.getInt("r_rate"),
+                        rs.getTimestamp("r_rating_date").toLocalDateTime());
                 ratings.add(rating);
             }
         } catch (SQLException e) {
@@ -54,6 +55,7 @@ public class RatingDao {
         }
         return ratings;
     }
+
     public Rating findByUserAndMovie(Users user, Movie movie) {
         String sql = "SELECT * FROM rating WHERE user_id = ? AND movie_id = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -71,7 +73,7 @@ public class RatingDao {
         }
         return null;
     }
-    public double getAverageRatingForMovie(int movieId){
+    public double getAverageRatingForMovie(int movieId) {
         String sql = "SELECT AVG(rate) AS average_rating FROM rating WHERE movie_id = ?";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -111,6 +113,7 @@ public class RatingDao {
         }
         return topRatedMovies;
     }
+
     public boolean updateRating(Rating rating) {
         String sql = "UPDATE rating SET rate = ?, rating_date = current_timestamp WHERE user_id = ? AND movie_id = ?";
         try (Connection conn = DBConnection.getConnection();
