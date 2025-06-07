@@ -24,6 +24,8 @@ import java.util.List;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import javafx.geometry.Rectangle2D;
+import javafx.event.ActionEvent;
+import java.util.Arrays;
 
 public class MainViewController {
     @FXML
@@ -37,8 +39,6 @@ public class MainViewController {
 
     @FXML
     private Button btnHome;
-    @FXML
-    private Button btnTrending;
     @FXML
     private TitledPane categoriesPane;
     @FXML
@@ -58,9 +58,30 @@ public class MainViewController {
     private FlowPane recommendedMoviesContainer;
     @FXML
     private FlowPane trendingMoviesContainer;
+    @FXML
+    private Button btnCategoryAction;
+    @FXML
+    private Button btnCategoryComedy;
+    @FXML
+    private Button btnCategoryDrama;
+    @FXML
+    private Button btnCategoryScienceFiction;
+    @FXML
+    private Button btnCategoryHorror;
+    @FXML
+    private Button btnCategoryRomance;
+    @FXML
+    private Button btnCategoryDocumentary;
+    @FXML
+    private Button btnCategoryAnimation;
+    @FXML
+    private Label lblTitle;
+    @FXML
+    private Label lblSubTitle;
 
     private Users loggedInUser;
     private RecommenderEngine recommenderEngine = new RecommenderEngine();
+    private String currentCategory = null;
 
     @FXML
     public void initialize() {
@@ -81,6 +102,7 @@ public class MainViewController {
             double centerY = bounds.getMinY() + (bounds.getHeight() - initialHeight) / 2;
             stage.setX(centerX);
             stage.setY(centerY);
+            categoriesPane.setExpanded(false);
         });
     }
 
@@ -132,7 +154,6 @@ public class MainViewController {
         btnSearch.setOnAction(event -> handleSearch());
 
         btnHome.setOnAction(event -> showHome());
-        btnTrending.setOnAction(event -> showTrending());
         btnNewReleases.setOnAction(event -> showNewReleases());
         btnFavorites.setOnAction(event -> showFavorites());
         btnWatchLater.setOnAction(event -> showWatchLater());
@@ -212,18 +233,77 @@ public class MainViewController {
             }
         }
     }
-
-    // Métodos para las diferentes secciones
-    private void showHome() {
-        // Implementación futura - Mostrar página de inicio
+    private void updateCategoryButtons(String selectedCategory) {
+        List<Button> categoryButtons = Arrays.asList(
+            btnCategoryAction, btnCategoryComedy, btnCategoryDrama, btnCategoryScienceFiction,
+            btnCategoryHorror, btnCategoryRomance, btnCategoryDocumentary, btnCategoryAnimation
+        );
+        
+        // Resetear todos los botones a su estilo normal
+        for (Button btn : categoryButtons) {
+            btn.getStyleClass().remove("category-button-selected");
+            if (!btn.getStyleClass().contains("category-button")) {
+                btn.getStyleClass().add("category-button");
+            }
+        }
+        
+        // Resaltar el botón seleccionado
+        if (selectedCategory != null) {
+            categoryButtons.forEach(btn -> {
+                if (btn.getText().equals(selectedCategory)) {
+                    btn.getStyleClass().remove("category-button");
+                    btn.getStyleClass().add("category-button-selected");
+                }
+            });
+        }
     }
 
-    private void showTrending() {
-        // Implementación futura - Mostrar películas tendencia
+    // Modificar el método handleCategorySelect para usar esta función
+    @FXML
+    private void handleCategorySelect(ActionEvent event) {
+        Button sourceButton = (Button) event.getSource();
+        String category = sourceButton.getText();
+        
+        currentCategory = category;
+        updateCategoryButtons(category);
+        loadMoviesByCategory(category);
+        lblTitle.setText("Categoría: " + category);
+        lblSubTitle.setText("Explora las mejores películas de " + category);
+    }
+    private void loadMoviesByCategory(String category) {
+        recommendedMoviesContainer.getChildren().clear();
+        MovieController movieController = new MovieController();
+        List<Movie> movies = movieController.getMoviesByGenre(category);
+        if (movies.isEmpty()) {
+            Label noMoviesLabel = new Label("No hay películas en esta categoría.");
+            noMoviesLabel.getStyleClass().add("placeholder-text");
+            recommendedMoviesContainer.getChildren().add(noMoviesLabel);
+        } else {
+            loadMoviesIntoContainer(movies, recommendedMoviesContainer);
+        }
+    }
+
+    private void showHome() {
+        currentCategory = null;
+        updateCategoryButtons(null);
+        updateUserInterface();
+        lblTitle.setText("Bienvenido a DialcaFlix!");
+        lblSubTitle.setText("Explora nuestras recomendaciones personalizadas y películas populares.");
     }
 
     private void showNewReleases() {
-        // Implementación futura - Mostrar nuevos lanzamientos
+        lblTitle.setText("Nuevos Lanzamientos");
+        lblSubTitle.setText("Descubre las últimas películas lanzadas.");
+        recommendedMoviesContainer.getChildren().clear();
+        MovieController movieController = new MovieController();
+        List<Movie> newReleases = movieController.getNewReleases(16);
+        if (newReleases != null && !newReleases.isEmpty()) {
+            loadMoviesIntoContainer(newReleases, recommendedMoviesContainer);
+        } else {
+            Label noMoviesLabel = new Label("No hay nuevos lanzamientos disponibles.");
+            noMoviesLabel.getStyleClass().add("placeholder-text");
+            recommendedMoviesContainer.getChildren().add(noMoviesLabel);
+        }
     }
 
     private void showFavorites() {
@@ -231,10 +311,20 @@ public class MainViewController {
     }
 
     private void showWatchLater() {
-        // Implementación futura - Mostrar lista "ver más tarde"
+        // Implementación futura - Mostrar películas para ver más tarde
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Funcionalidad en desarrollo");
+        alert.setHeaderText(null);
+        alert.setContentText("La funcionalidad 'Ver más tarde' aún no está implementada.");
+        alert.showAndWait();
     }
 
     private void showHistory() {
-        // Implementación futura - Mostrar historial de visualización
+        // Implementación futura - Mostrar historial de visualización del usuario
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Funcionalidad en desarrollo");
+        alert.setHeaderText(null);
+        alert.setContentText("La funcionalidad 'Historial' aún no está implementada.");
+        alert.showAndWait();
     }
 }
