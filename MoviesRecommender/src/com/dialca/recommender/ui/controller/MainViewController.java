@@ -1,9 +1,8 @@
 package com.dialca.recommender.ui.controller;
 
-import com.dialca.recommender.model.Users;
+import com.dialca.recommender.model.*;
 import com.dialca.recommender.controller.MovieController;
 import com.dialca.recommender.controller.RatingController;
-import com.dialca.recommender.model.Movie;
 import java.util.ArrayList;
 import com.dialca.recommender.ia.*;
 import com.dialca.recommender.ui.controller.MovieCardController;
@@ -27,6 +26,9 @@ import java.io.InputStream;
 import javafx.geometry.Rectangle2D;
 import javafx.event.ActionEvent;
 import java.util.Arrays;
+import javafx.scene.layout.VBox;
+import javafx.geometry.Pos;
+import javafx.scene.control.ProgressIndicator;
 
 public class MainViewController {
     @FXML
@@ -79,6 +81,8 @@ public class MainViewController {
     private Label lblTitle;
     @FXML
     private Label lblSubTitle;
+    @FXML
+    private StackPane loadingPane;
 
     private Users loggedInUser;
     private RecommenderEngine recommenderEngine = new RecommenderEngine();
@@ -86,6 +90,26 @@ public class MainViewController {
 
     @FXML
     public void initialize() {
+        if (loadingPane == null) {
+            loadingPane = new StackPane();
+            loadingPane.setStyle("-fx-background-color: rgba(0, 0, 0, 0.7);");
+            ProgressIndicator progressIndicator = new ProgressIndicator();
+            progressIndicator.setPrefSize(100, 100);
+            progressIndicator.setStyle("-fx-progress-color: #e50914;");
+            Label loadingLabel = new Label("Cargando contenido...");
+            loadingLabel.setStyle("-fx-text-fill: white; -fx-font-size: 16px;");
+            VBox loadingContent = new VBox(15, progressIndicator, loadingLabel);
+            loadingContent.setAlignment(Pos.CENTER);
+            loadingPane.getChildren().add(loadingContent);
+            loadingPane.setAlignment(Pos.CENTER);
+            Platform.runLater(() -> {
+                if (contentArea != null) {
+                    contentArea.getChildren().add(loadingPane);
+                    loadingPane.toFront();
+                    loadingPane.setPrefSize(contentArea.getWidth(), contentArea.getHeight());
+                }
+            });
+        }
         loadLogo();
         setupEventHandlers();
         setupSearchField();
@@ -110,7 +134,23 @@ public class MainViewController {
 
     public void setLoggedInUser(Users user) {
         this.loggedInUser = user;
-        updateUserInterface();
+        if (loadingPane == null) {
+            System.err.println("Loading pane is null, cannot set user interface.");
+        } else {
+            loadingPane.setVisible(false);
+        }
+        if (user != null) {
+            lblUserName.setText(user.getName());
+            btnFavorites.setVisible(true);
+            btnWatchLater.setVisible(true);
+            btnHistory.setVisible(true);
+        } else {
+            lblUserName.setText("Invitado");
+            btnFavorites.setVisible(false);
+            btnWatchLater.setVisible(false);
+            btnHistory.setVisible(false);
+        }
+        loadUIAsync();
     }
 
     private void updateUserInterface() {
@@ -291,15 +331,12 @@ public class MainViewController {
                 btnCategoryAction, btnCategoryComedy, btnCategoryDrama, btnCategoryScienceFiction,
                 btnCategoryHorror, btnCategoryRomance, btnCategoryDocumentary, btnCategoryAnimation);
 
-        // Resetear todos los botones a su estilo normal
         for (Button btn : categoryButtons) {
             btn.getStyleClass().remove("category-button-selected");
             if (!btn.getStyleClass().contains("category-button")) {
                 btn.getStyleClass().add("category-button");
             }
         }
-
-        // Resaltar el botón seleccionado
         if (selectedCategory != null) {
             categoryButtons.forEach(btn -> {
                 if (btn.getText().equals(selectedCategory)) {
@@ -310,7 +347,6 @@ public class MainViewController {
         }
     }
 
-    // Modificar el método handleCategorySelect para usar esta función
     @FXML
     private void handleCategorySelect(ActionEvent event) {
         Button sourceButton = (Button) event.getSource();
@@ -360,11 +396,41 @@ public class MainViewController {
     }
 
     private void showFavorites() {
-        // Implementación futura - Mostrar favoritos del usuario
+        lblTitle.setText("Mis Películas Calificadas");
+        lblSubTitle.setText("Películas que has calificado");
+        recommendedMoviesContainer.getChildren().clear();
+        trendingMoviesContainer.getChildren().clear();
+
+        if (loggedInUser != null) {
+            RatingController ratingController = new RatingController();
+            List<Rating> userRatings = ratingController.getRatingsByUser(loggedInUser);
+
+            if (userRatings != null && !userRatings.isEmpty()) {
+                List<Movie> ratedMovies = userRatings.stream()
+                        .map(Rating::getMovie)
+                        .distinct()
+                        .collect(Collectors.toList());
+                loadMoviesIntoContainer(ratedMovies, recommendedMoviesContainer);
+                Label infoLabel = new Label("Has calificado " + ratedMovies.size() +
+                        " películas. Tus calificaciones ayudan a mejorar tus recomendaciones.");
+                infoLabel.getStyleClass().add("info-text");
+                infoLabel.setWrapText(true);
+                recommendedMoviesContainer.getChildren().add(0, infoLabel);
+            } else {
+                Label noMoviesLabel = new Label("Aún no has calificado películas.\n" +
+                        "Calificar películas nos permite ofrecerte mejores recomendaciones.");
+                noMoviesLabel.getStyleClass().add("placeholder-text");
+                noMoviesLabel.setWrapText(true);
+                recommendedMoviesContainer.getChildren().add(noMoviesLabel);
+            }
+        } else {
+            Label loginPromptLabel = new Label("Inicia sesión para ver tus películas calificadas");
+            loginPromptLabel.getStyleClass().add("placeholder-text");
+            recommendedMoviesContainer.getChildren().add(loginPromptLabel);
+        }
     }
 
     private void showWatchLater() {
-        // Implementación futura - Mostrar películas para ver más tarde
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Funcionalidad en desarrollo");
         alert.setHeaderText(null);
@@ -373,11 +439,94 @@ public class MainViewController {
     }
 
     private void showHistory() {
-        // Implementación futura - Mostrar historial de visualización del usuario
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Funcionalidad en desarrollo");
         alert.setHeaderText(null);
         alert.setContentText("La funcionalidad 'Historial' aún no está implementada.");
         alert.showAndWait();
+    }
+    private void loadUIAsync() {
+        showLoading(true);
+        Thread dataLoadingThread = new Thread(() -> {
+            try {
+                List<Movie> recommendedMovies;
+                List<Movie> trendingMovies;
+                
+                try {
+                    if (loggedInUser != null) {
+                        recommendedMovies = recommenderEngine.getRecommendations(loggedInUser);
+                    } else {
+                        recommendedMovies = recommenderEngine.getBasicRecommendations();
+                    }
+                    RatingController ratingController = new RatingController();
+                    trendingMovies = ratingController.getTopRatedMovies(12);
+                    
+                    // Actualizar la UI con los datos cargados
+                    final List<Movie> finalRecommended = recommendedMovies;
+                    final List<Movie> finalTrending = trendingMovies;
+                    
+                    Platform.runLater(() -> {
+                        try {
+                            updateUIWithLoadedData(finalRecommended, finalTrending);
+                        } catch (Exception e) {
+                            System.err.println("Error al actualizar la UI: " + e.getMessage());
+                            e.printStackTrace();
+                        } finally {
+                            hideLoadingPane();
+                        }
+                    });
+                } catch (Exception e) {
+                    System.err.println("Error al cargar datos: " + e.getMessage());
+                    e.printStackTrace();
+
+                    Platform.runLater(this::hideLoadingPane);
+                }
+            } catch (Exception e) {
+                System.err.println("Error crítico en el hilo de carga: " + e.getMessage());
+                e.printStackTrace();
+                Platform.runLater(this::hideLoadingPane);
+            }
+        });
+        
+        dataLoadingThread.setDaemon(true);
+        dataLoadingThread.start();
+    }
+    private void hideLoadingPane() {
+        if (loadingPane != null) {
+            loadingPane.setVisible(false);
+            loadingPane.setManaged(false);
+            System.out.println("Panel de carga ocultado correctamente");
+        } else {
+            System.err.println("El panel de carga es nulo, no se puede ocultar");
+        }
+    }
+
+    private void showLoading(boolean show) {
+        if (loadingPane != null) {
+            Platform.runLater(() -> {
+                loadingPane.setVisible(show);
+                loadingPane.setManaged(show);
+            });
+        }
+    }
+
+    private void updateUIWithLoadedData(List<Movie> recommendedMovies, List<Movie> trendingMovies) {
+        List<Movie> moviesToShowRecommended = recommendedMovies.stream()
+                .limit(16)
+                .collect(Collectors.toList());
+        loadMoviesIntoContainer(moviesToShowRecommended, recommendedMoviesContainer);
+        List<Movie> processedTrendingMovies = new ArrayList<>(trendingMovies);
+        if (trendingMovies.size() < 6) {
+            MovieController movieController = new MovieController();
+            List<Movie> additionalMovies = movieController.getAllMovies().stream()
+                    .filter(movie -> !trendingMovies.contains(movie))
+                    .limit(6 - trendingMovies.size())
+                    .collect(Collectors.toList());
+            processedTrendingMovies.addAll(additionalMovies);
+        }
+        List<Movie> moviesToShowTrending = processedTrendingMovies.stream()
+                .limit(16)
+                .collect(Collectors.toList());
+        loadMoviesIntoContainer(moviesToShowTrending, trendingMoviesContainer);
     }
 }
