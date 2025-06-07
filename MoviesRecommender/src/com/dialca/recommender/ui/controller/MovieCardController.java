@@ -1,13 +1,21 @@
 package com.dialca.recommender.ui.controller;
 
 import com.dialca.recommender.model.Movie;
+import com.dialca.recommender.model.Users;
+
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -52,8 +60,32 @@ public class MovieCardController {
         }
     }
 
-    public void setOnWatchClicked(Runnable callback) {
-        this.onWatchClicked = callback;
+    public void setOnWatchClicked(Movie movie, Users currentUser) {
+        btnWatch.setOnAction(event -> {
+            try {
+                // Corregir la ruta al archivo FXML - el nombre era incorrecto
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/dialca/recommender/ui/view/components/MovieDetails.fxml"));
+                Parent detailsRoot = loader.load();
+                
+                MovieDetailsController detailsController = loader.getController();
+                detailsController.setMovie(movie, currentUser);
+                
+                Stage detailsStage = new Stage();
+                detailsStage.initModality(Modality.APPLICATION_MODAL);
+                detailsStage.initStyle(StageStyle.DECORATED); // Cambiado a DECORATED para tener barra de título
+                detailsStage.setTitle(movie.getTitle() + " - DialcaFlix");
+                detailsStage.setScene(new Scene(detailsRoot));
+                
+                Stage primaryStage = (Stage) btnWatch.getScene().getWindow();
+                detailsStage.initOwner(primaryStage);
+                
+                detailsStage.showAndWait();
+            }
+            catch (Exception e) {
+                System.err.println("Error al cargar la vista de detalles de la película: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
     }
     private void loadPosterImage(String posterUrl) {
         if (loadingIndicator != null) {
