@@ -205,10 +205,7 @@ public class MainViewController {
                 Parent movieCard = loader.load();
                 MovieCardController controller = loader.getController();
                 controller.setMovie(movie);
-                controller.setOnWatchClicked(() -> {
-                    System.out.println("Ver película: " + movie.getTitle());
-                    // Aqui abrira los detalles de la película
-                });
+                controller.setOnWatchClicked(movie, loggedInUser);
                 container.getChildren().add(movieCard);
             } catch (Exception e) {
                 System.err.println("Error al cargar MovieCard: " + e.getMessage());
