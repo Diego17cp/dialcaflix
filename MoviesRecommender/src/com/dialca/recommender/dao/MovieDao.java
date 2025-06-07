@@ -111,4 +111,22 @@ public class MovieDao {
         }
         return movies;
     }
+    public List<Movie> getNewReleases(int limit) {
+        List<Movie> movies = new ArrayList<>();
+        String sql = "SELECT * FROM movie ORDER BY year DESC LIMIT ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, limit);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Movie movie = new Movie(rs.getInt("id"), rs.getString("title"), rs.getString("genre"),
+                        rs.getInt("year"), rs.getString("description"), rs.getString("poster_url"));
+                movies.add(movie);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener nuevos lanzamientos");
+            e.printStackTrace();
+        }
+        return movies;
+    }
 }
