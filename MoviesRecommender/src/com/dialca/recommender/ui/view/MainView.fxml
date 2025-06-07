@@ -12,41 +12,30 @@
             stylesheets="@../styles/main-styles.css"
             prefWidth="1000" 
             prefHeight="700">
-    
-    <!-- Barra Superior -->
     <top>
         <HBox styleClass="top-bar" alignment="CENTER_LEFT" spacing="20">
             <padding><Insets top="15" right="25" bottom="15" left="25"/></padding>
-            
-            <!-- Logo -->
             <ImageView fx:id="imgLogo" fitWidth="160" fitHeight="40" preserveRatio="true"/>
-            
-            <!-- Buscador -->
             <HBox HBox.hgrow="ALWAYS" alignment="CENTER" maxWidth="500" styleClass="search-container">
                 <TextField fx:id="txtSearch" promptText="Buscar películas..." styleClass="search-box" HBox.hgrow="ALWAYS"/>
                 <Button fx:id="btnSearch" styleClass="search-button">
                     <graphic>
                         <SVGPath content="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
-                              styleClass="search-icon"/>
+                                styleClass="search-icon"/>
                     </graphic>
                 </Button>
             </HBox>
             
             <Region HBox.hgrow="ALWAYS"/>
-            
-            <!-- Nombre del usuario -->
             <Label fx:id="lblUserName" styleClass="user-name"/>
         </HBox>
     </top>
-    
-    <!-- Panel de navegación lateral -->
     <left>
         <VBox styleClass="side-nav">
             <padding><Insets top="25" right="15" bottom="25" left="15"/></padding>
             
             <Label text="EXPLORAR" styleClass="nav-section"/>
             <Button text="Inicio" fx:id="btnHome" styleClass="nav-button" />
-            <!-- Acordeón de categorías - ahora cerrado por defecto -->
             <TitledPane text="Categorías" fx:id="categoriesPane" styleClass="categories-pane" expanded="false">
                 <VBox spacing="5">
                     <Button fx:id="btnCategoryAction" text="Acción" styleClass="category-button" onAction="#handleCategorySelect"/>
@@ -72,27 +61,18 @@
             <Button text="Historial" fx:id="btnHistory" styleClass="nav-button"/>
             
             <Region VBox.vgrow="ALWAYS"/>
-            
-            <!-- Botón de cerrar sesión -->
             <Button text="Cerrar Sesión" fx:id="btnLogout" styleClass="logout-button"/>
         </VBox>
     </left>
-    
-    <!-- Contenido principal -->
     <center>
         <StackPane fx:id="contentArea" styleClass="content-area">
-            <!-- Aquí se cargarán los diferentes contenidos -->
             <ScrollPane fitToWidth="true" styleClass="content-scroll">
                 <VBox spacing="30" styleClass="content-container">
                     <padding><Insets top="30" right="40" bottom="40" left="40"/></padding>
-                    
-                    <!-- Sección de bienvenida -->
                     <VBox styleClass="welcome-section">
                         <Label fx:id="lblTitle" text="¡Bienvenido a DialcaFlix!" styleClass="welcome-title"/>
                         <Label fx:id="lblSubTitle" text="Descubre películas personalizadas para ti" styleClass="welcome-subtitle"/>
                     </VBox>
-                    
-                    <!-- Sección de recomendaciones -->
                     <VBox spacing="15">
                         <HBox alignment="CENTER_LEFT" spacing="15">
                             <Label text="Recomendadas para ti" styleClass="section-title"/>
@@ -105,8 +85,6 @@
                             <Label text="Cargando recomendaciones..." styleClass="placeholder-text"/>
                         </FlowPane>
                     </VBox>
-                    
-                    <!-- Sección de tendencias -->
                     <VBox spacing="15">
                         <HBox alignment="CENTER_LEFT" spacing="15">
                             <Label text="Tendencias" styleClass="section-title"/>
