@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.TextFlow?>
+<?import javafx.scene.shape.Rectangle?>
+
+<AnchorPane fx:id="root" xmlns="http://javafx.com/javafx/16" 
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.dialca.recommender.ui.controller.MovieDetailsController"
+           prefWidth="800" prefHeight="600"
+           styleClass="details-container"
+           stylesheets="@../../styles/movie-details-styles.css"
+           >
+    
+    <HBox spacing="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
+         AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0">
+        
+        <!-- Panel izquierdo - Póster -->
+        <StackPane styleClass="poster-container">
+            <!-- Clip para el póster -->
+            <Rectangle width="320" height="480" styleClass="poster-clip"/> 
+            
+            <!-- Póster de la película -->
+            <ImageView fx:id="imgPoster" fitWidth="320" fitHeight="480" 
+                       preserveRatio="true" styleClass="poster-image"/>
+                       
+            <!-- Indicador de carga -->
+            <ProgressIndicator fx:id="loadingIndicator" visible="false" 
+                              styleClass="loading-indicator"/>
+                              
+            <!-- Año de publicación como badge en esquina superior -->
+            <Label fx:id="lblYear" text="2023" styleClass="year-badge">
+                <StackPane.alignment>TOP_LEFT</StackPane.alignment>
+                <padding><Insets top="8" right="12" bottom="8" left="12"/></padding>
+            </Label>
+            
+            <!-- Género como badge en esquina inferior -->
+            <Label fx:id="lblGenre" text="Action" styleClass="genre-badge">
+                <StackPane.alignment>BOTTOM_LEFT</StackPane.alignment>
+                <padding><Insets top="8" right="12" bottom="8" left="12"/></padding>
+            </Label>
+        </StackPane>
+        
+        <!-- Panel derecho - Información -->
+        <VBox spacing="15" styleClass="info-container" HBox.hgrow="ALWAYS">
+            <padding><Insets top="30" right="30" bottom="30" left="30"/></padding>
+            
+            <!-- Título -->
+            <Label fx:id="lblTitle" text="Título de la Película" 
+                  styleClass="movie-title" wrapText="true"/>
+            
+            <!-- Calificación promedio -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Calificación:" styleClass="label-heading"/>
+                <HBox fx:id="averageRatingContainer" spacing="2" alignment="CENTER_LEFT">
+                    <!-- Las estrellas se agregarán dinámicamente -->
+                </HBox>
+                <Label fx:id="lblAverageRating" text="4.5" styleClass="rating-value"/>
+            </HBox>
+            
+            <!-- Descripción -->
+            <Label text="Descripción:" styleClass="label-heading"/>
+            <ScrollPane fitToWidth="true" styleClass="synopsis-container">
+                <TextFlow>
+                    <Text fx:id="txtSynopsis" text="Descripción de la película..." 
+                         styleClass="synopsis-text"/>
+                </TextFlow>
+            </ScrollPane>
+            
+            <!-- Separador -->
+            <Separator styleClass="separator"/>
+            
+            <!-- Tu calificación -->
+            <Label text="Tu calificación:" styleClass="label-heading"/>
+            <HBox fx:id="userRatingContainer" spacing="8" alignment="CENTER_LEFT">
+                <Button fx:id="btnStar1" styleClass="star-button, star-empty" 
+                       onAction="#handleStar1Click"/>
+                <Button fx:id="btnStar2" styleClass="star-button, star-empty" 
+                       onAction="#handleStar2Click"/>
+                <Button fx:id="btnStar3" styleClass="star-button, star-empty" 
+                       onAction="#handleStar3Click"/>
+                <Button fx:id="btnStar4" styleClass="star-button, star-empty" 
+                       onAction="#handleStar4Click"/>
+                <Button fx:id="btnStar5" styleClass="star-button, star-empty" 
+                       onAction="#handleStar5Click"/>
+            </HBox>
+            
+            <!-- Mensaje informativo -->
+            <Label text="¡Tus calificaciones nos ayudan a mejorar tus recomendaciones!" 
+                  styleClass="info-text"/>
+            
+            <!-- Botones de acción -->
+            <HBox spacing="15" alignment="CENTER_RIGHT">
+                <Button fx:id="btnAddToFavorites" text="Añadir a favoritos" 
+                       styleClass="action-button" onAction="#handleAddToFavorites"/>
+                <Button fx:id="btnWatchLater" text="Ver más tarde" 
+                       styleClass="action-button" onAction="#handleAddToWatchLater"/>
+                <Button fx:id="btnClose" text="Cerrar" 
+                       styleClass="action-button" onAction="#handleClose"/>
+            </HBox>
+        </VBox>
+    </HBox>
+</AnchorPane>
