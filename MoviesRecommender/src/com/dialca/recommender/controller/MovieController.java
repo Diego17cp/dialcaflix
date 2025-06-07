@@ -29,4 +29,7 @@ public class MovieController {
     public List<Movie> searchMovies(String query){
         return movieDao.searchMovies(query);
     }
+    public List<Movie> getNewReleases (int limit) {
+        return movieDao.getNewReleases(limit);
+    }
 }
