@@ -23,6 +23,7 @@ import javafx.stage.Stage;
 import java.util.List;
 import java.io.FileInputStream;
 import java.io.InputStream;
+
 import javafx.geometry.Rectangle2D;
 import javafx.event.ActionEvent;
 import java.util.Arrays;
@@ -87,6 +88,7 @@ public class MainViewController {
     public void initialize() {
         loadLogo();
         setupEventHandlers();
+        setupSearchField();
         updateUserInterface();
         Platform.runLater(() -> {
             Stage stage = (Stage) imgLogo.getScene().getWindow();
@@ -164,9 +166,57 @@ public class MainViewController {
     private void handleSearch() {
         String searchQuery = txtSearch.getText().trim();
         if (!searchQuery.isEmpty()) {
-            System.out.println("Buscando: " + searchQuery);
-            // La implementación de búsqueda se realizará más adelante
+            recommendedMoviesContainer.getChildren().clear();
+            trendingMoviesContainer.getChildren().clear();
+            lblTitle.setText("Resultados de búsqueda: \"" + searchQuery + "\"");
+            lblSubTitle.setText("Explora las películas que coinciden con tu búsqueda.");
+            MovieController movieController = new MovieController();
+            List<Movie> searchResults = movieController.searchMovies(searchQuery);
+            List<String> possibleGenres = findMatchingGenres(searchQuery);
+            List<Movie> genreResults = new ArrayList<>();
+            if (!possibleGenres.isEmpty()) {
+                String bestMatchGenre = possibleGenres.get(0);
+                genreResults = movieController.getMoviesByGenre(bestMatchGenre);
+                genreResults = genreResults.stream()
+                        .filter(movie -> !searchResults.contains(movie))
+                        .collect(Collectors.toList());
+            }
+            List<Movie> combinedResults = new ArrayList<>(searchResults);
+            combinedResults.addAll(genreResults);
+            if (combinedResults.isEmpty()) {
+                Label noResultsLabel = new Label("No se encontraron resultados para tu búsqueda.");
+                noResultsLabel.getStyleClass().add("placeholder-text");
+                recommendedMoviesContainer.getChildren().add(noResultsLabel);
+            } else {
+                loadMoviesIntoContainer(combinedResults, recommendedMoviesContainer);
+                Label resultsLabel = new Label("Se encontraron " + combinedResults.size() + " resultados.");
+                resultsLabel.getStyleClass().add("results-label");
+                recommendedMoviesContainer.getChildren().add(resultsLabel);
+            }
         }
+    }
+
+    private List<String> findMatchingGenres(String query) {
+        final String queryLower = query.toLowerCase();
+        List<String> allGenres = Arrays.asList("Acción", "Comedia", "Drama", "Ciencia Ficción",
+                "Terror", "Romance", "Documental", "Animación");
+        List<String> exactMatches = allGenres.stream()
+                .filter(genre -> genre.toLowerCase().equals(queryLower))
+                .collect(Collectors.toList());
+        if (!exactMatches.isEmpty())
+            return exactMatches;
+        return allGenres.stream()
+                .filter(genre -> genre.toLowerCase().contains(queryLower) ||
+                        queryLower.contains(genre.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    private void setupSearchField() {
+        txtSearch.setOnKeyPressed(event -> {
+            if (event.getCode() == javafx.scene.input.KeyCode.ENTER) {
+                handleSearch();
+            }
+        });
     }
 
     private void handleLogout() {
@@ -218,11 +268,13 @@ public class MainViewController {
                 .collect(Collectors.toList());
         loadMoviesIntoContainer(moviesToShow, trendingMoviesContainer);
     }
+
     private void loadMoviesIntoContainer(List<Movie> movies, FlowPane container) {
         container.getChildren().clear();
         for (Movie movie : movies) {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/dialca/recommender/ui/view/components/MovieCard.fxml"));
+                FXMLLoader loader = new FXMLLoader(
+                        getClass().getResource("/com/dialca/recommender/ui/view/components/MovieCard.fxml"));
                 Parent movieCard = loader.load();
                 MovieCardController controller = loader.getController();
                 controller.setMovie(movie);
@@ -233,12 +285,12 @@ public class MainViewController {
             }
         }
     }
+
     private void updateCategoryButtons(String selectedCategory) {
         List<Button> categoryButtons = Arrays.asList(
-            btnCategoryAction, btnCategoryComedy, btnCategoryDrama, btnCategoryScienceFiction,
-            btnCategoryHorror, btnCategoryRomance, btnCategoryDocumentary, btnCategoryAnimation
-        );
-        
+                btnCategoryAction, btnCategoryComedy, btnCategoryDrama, btnCategoryScienceFiction,
+                btnCategoryHorror, btnCategoryRomance, btnCategoryDocumentary, btnCategoryAnimation);
+
         // Resetear todos los botones a su estilo normal
         for (Button btn : categoryButtons) {
             btn.getStyleClass().remove("category-button-selected");
@@ -246,7 +298,7 @@ public class MainViewController {
                 btn.getStyleClass().add("category-button");
             }
         }
-        
+
         // Resaltar el botón seleccionado
         if (selectedCategory != null) {
             categoryButtons.forEach(btn -> {
@@ -263,13 +315,14 @@ public class MainViewController {
     private void handleCategorySelect(ActionEvent event) {
         Button sourceButton = (Button) event.getSource();
         String category = sourceButton.getText();
-        
+
         currentCategory = category;
         updateCategoryButtons(category);
         loadMoviesByCategory(category);
         lblTitle.setText("Categoría: " + category);
         lblSubTitle.setText("Explora las mejores películas de " + category);
     }
+
     private void loadMoviesByCategory(String category) {
         recommendedMoviesContainer.getChildren().clear();
         MovieController movieController = new MovieController();
